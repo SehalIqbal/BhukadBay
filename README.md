@@ -56,3 +56,5 @@ Although not the main focus, I added several production-like features with ChatG
 > These features were added to make the chatbot more useful by working with actual data.
 
 ---
+<img width="960" height="583" alt="Screenshot 2025-08-04 093443" src="https://github.com/user-attachments/assets/9d70625b-1821-47aa-8b9e-8af4fd329a40" />
+
