@@ -1,0 +1,229 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "public": true,
+        "mode": "webhook",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        -6320,
+        32
+      ],
+      "id": "313c5a0a-a6ef-47e0-9991-94ca9cf4a89c",
+      "name": "When chat message received",
+      "webhookId": "6f3f168b-c586-4d00-a69b-5ee28a804e46"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "=You are a helpful customer support chatbot for a food ordering website (FoodDel).\n\nYou have access to the following MongoDB tools. Use them as needed based on the customer's question.\n\n---\n\n🔹 **PromoCode DB**\n- Queries the `promocodes` collection\n- Use this tool when a customer asks about:\n  - Promotions\n  - Discounts\n  - Deals\n\nWhen a customer asks about promotions, discounts, or deals, look at the output from the tool and answer based on the available offers.\n\n---\n\n🔹 **Orders DB**\n- Queries the `orders` collection\n\nWhen a user asks about a specific order:\n\n- Ask for the **order ID**\n- Once provided, use the tool to find their order and respond naturally\n\nSample flow:\n> \"Sure! Can you share your order ID?\"\n> \"Thank you! Let me check... ✅ Your order was delivered and paid via COD.\"\n\n---\n\n🔹 **Foods DB**\n- Queries the `foods` collection\n\nUse this tool when the user asks about:\n- The available menu\n- Specific food items\n- Stock availability\n- Ordering a certain quantity\n- Food item details (like calories or ingredients)\n\n---\n\n✅ **How to respond using Foods DB:**\n\n1. **Menu inquiries:**\n   - Use the tool to fetch all items (`available: true`)\n   - Respond naturally:\n     > \"Here's what we currently have: Chicken Roll, Veg Biryani, and more.\"\n\n2. **Specific item availability (e.g. 'Do you have chicken roll?'):**\n   - Match the item by name\n   - If found and available:\n     > \"Yes! Chicken Roll is available. Would you like to place an order?\"\n\n3. **Quantity checks (e.g. 'I want 50 Chicken Rolls'):**\n   - Check the `stock` field\n   - If requested quantity ≤ stock:\n     > \"Sure! Let me guide you step-by-step to place your order for 5 Chicken Rolls.\"\n   - If requested quantity > stock:\n     > \"For bulk orders, please contact our owner directly by phone.\"\n\n4. **Item-specific questions (e.g. calories, ingredients):**\n   - Search by name\n   - Check if the `description` field contains the requested info\n     - If found:\n       > \"The Chicken Roll has about 200 calories.\"\n     - If not:\n       > \"Sorry, I don't have this information for the item.\"\n\n---\n\n**If a customer asks wants to complain, respond with these:**\n  - if user wants to complain provide him \n  this phone number yo contact \"0339-2273743\"\n  and email \"sehaliqbal27@gmail.com\" to send complain \n\n---\n\n📌 **General Behavior Guidelines:**\n\n- Never reveal exact stock numbers unless directly asked\n- Do not use technical language, raw JSON, or code blocks in user replies\n- For **placing orders**, respond:\n  > \"I can't place orders directly, but I can guide you through it!\"\n\nThen explain the steps:\n\n**If a customer asks how to order, respond with these steps:**\n\n1. Click the Menu Page or scroll down from the Home Page\n2. Click the Add button to add items to cart\n3. Go to the cart from the top-right cart icon\n4. Proceed to checkout\n5. Apply a promocode if available (optional)\n\n- When unavailable, suggest alternatives\n- Always sound polite, helpful, and human\n\n---\n\n🚫 **Off-Topic Questions**\n\nYou are strictly a customer support assistant for the **FoodDel** food ordering platform.\nIf the user asks something **unrelated** (e.g., weather, celebrities, definitions, jokes, tech support), respond politely:\n\n> \"I'm here to assist with anything related to FoodDel — like orders, menu, discounts, or help placing an order. For anything else, I'm afraid I won't be able to help.\"\n\nNever attempt to answer general knowledge, personal, or irrelevant questions.\nNever attempt to create answers by yourself you are to strictly answer based on the tools you have access to.\n\nIf user uses wrong currency correct him.\nfor example:\nAll items are in dollars($). if user uses a different currency like euros or anything else correct him\n\n---\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        -6064,
+        32
+      ],
+      "id": "fb924253-456c-4325-8f3b-05d761767f92",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "value": "gpt-3.5-turbo-0125",
+          "mode": "list",
+          "cachedResultName": "gpt-3.5-turbo-0125"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        -6064,
+        256
+      ],
+      "id": "b9152e97-1cf0-46c7-8308-0793f643ec7d",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "rjE8oXIPxcAhqUxj",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "collection": "=promocodes",
+        "options": {},
+        "query": "={}"
+      },
+      "type": "n8n-nodes-base.mongoDbTool",
+      "typeVersion": 1.2,
+      "position": [
+        -5808,
+        224
+      ],
+      "id": "80c1fdea-577c-4101-96f3-ad6209a04667",
+      "name": "PromoCode DB",
+      "credentials": {
+        "mongoDb": {
+          "id": "ytmWkpUOIHpOtgFU",
+          "name": "MongoDB account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "collection": "orders",
+        "options": {},
+        "query": "={}"
+      },
+      "type": "n8n-nodes-base.mongoDbTool",
+      "typeVersion": 1.2,
+      "position": [
+        -5696,
+        192
+      ],
+      "id": "3f6bb69d-748d-431e-9012-969fbc2cebe0",
+      "name": "Orders DB",
+      "credentials": {
+        "mongoDb": {
+          "id": "ytmWkpUOIHpOtgFU",
+          "name": "MongoDB account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "collection": "foods",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.mongoDbTool",
+      "typeVersion": 1.2,
+      "position": [
+        -5600,
+        176
+      ],
+      "id": "e581241d-b77b-4954-9a98-9f7b764d1421",
+      "name": "Foods DB",
+      "credentials": {
+        "mongoDb": {
+          "id": "ytmWkpUOIHpOtgFU",
+          "name": "MongoDB account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -5920,
+        336
+      ],
+      "id": "b4b9b522-0816-4d19-af48-407e01ee0ce9",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "content": "## AI Agent\n**Main brain of the chatbot\nUses tools based on query type:\nPromoCode DB → discounts/promotions\nOrders DB → order status (needs Order ID)\nFoods DB → menu, availability, quantity, and details\nResponds politely, follows scripted guidelines\nRejects irrelevant or off-topic queries**\n",
+        "height": 624,
+        "width": 656
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -6160,
+        -176
+      ],
+      "id": "6b3bad68-0c07-4f33-a06d-91e0e7c20fb9",
+      "name": "Sticky Note16"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "PromoCode DB": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Orders DB": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Foods DB": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "21b8c2ba-6003-46c2-a715-97f33b40d72e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "983181e1bc04dcd45c5be028907a6f35ef9c57b4ce603e8e23f8edbaf2609ae1"
+  },
+  "id": "yKZuQJPpbZzLVSWl",
+  "tags": []
+}
