@@ -1,60 +1,146 @@
-# 🥗 Food-Del Web — Automation-Focused Food Ordering Site
+# BhukkadBay — n8n Orchestrated Food Ordering Platform
 
-**Food-Del Web** is a React-based food ordering platform that I used as a **playground to explore automation**, specifically with **n8n**. While the frontend was based on a YouTube tutorial, I significantly customized it using ChatGPT — adding several features like promo codes, Stripe payments, reviews, and admin controls.
+**BhukkadBay** is a full-stack food ordering platform with an AI-powered support chatbot orchestrated entirely through **n8n**. The chatbot connects to live MongoDB databases, understands natural language queries, and handles menu browsing, order tracking, and promo code lookups — completely automatically, without any manual support effort.
 
-However, the **main focus of this project** was **not web development** — it was to **integrate a fully functional support chatbot using n8n**, an open-source automation tool I'm currently learning.
-
----
-
-## 🎯 Project Goal
-
-> To build a real-world use case for automation by creating a smart, chatbot-powered support system using **n8n** — with a working website as the base.
+> The primary focus of this project is the **n8n automation workflow**, not the web app itself. The frontend serves as the real-world context in which the automation runs.
 
 ---
 
-## 🤖 Main Feature: n8n-Powered Support ChatBot
+## Project Structure
 
-- **Floating chatbot widget** integrated into the website
-- Built using **n8n's Chat Trigger + MongoDB + HTTP Request nodes**
-- Works like a virtual support agent:
-- Users can ask: _“Show me the menu”_, _“Any promo codes?”_, _“Where is my order?”_
-- Bot fetches **real-time data** from **MongoDB Atlas**
-- Fully extensible with n8n’s low-code visual interface
-
-> This chatbot is a **real automation workflow**, not a static script.
-
----
-
-## 🧠 ChatBot Architecture (n8n)
-Frontend Chat Widget → n8n Chat Trigger → MongoDB Query → Response Node → Return to Frontend
-
-- Uses MongoDB tools inside an AI Agent in n8n
-- Understands the intent behind customer prompts and provides accurate, relevant answers 
-- Handles dynamic customer prompts like:
-  - "Show me the menu"
-  - "Are there any promo codes?"
-  - "What’s the status of my order?"
-- Fetches real-time data from MongoDB Atlas
-- Designed to be extended (e.g., SMS alerts, FAQ replies)
+```
+n8n_Food-Del/
+├── frontend/          # React customer-facing website (BhukkadBay)
+├── admin/             # React admin dashboard
+├── backend/           # Node.js + Express REST API
+│   ├── models/        # MongoDB schemas (Food, Order, User, PromoCode, Review)
+│   ├── controllers/   # Business logic
+│   ├── routes/        # API endpoints
+│   └── server.js      # Entry point
+└── E-Commerce Support Chatbot.json   # n8n workflow (importable)
+```
 
 ---
 
-## 🛒 Secondary Features (Frontend Customizations)
+## The Main Feature: n8n Orchestrated Chatbot
 
-Although not the main focus, I added several production-like features with ChatGPT’s help:
+The chatbot is embedded directly on the BhukkadBay website. Every customer message triggers an n8n workflow that uses **OpenAI** for natural language understanding and **MongoDB** for live data — making it both conversational and functional.
 
-- 🔍 **Search Bar** with live filtering
-- 🛒 **Cart System** with add/remove/update
-- 🎟 **Promo Code** system (apply at checkout)
-- 💳 **Stripe Payment Integration**
-- ⭐ **Ratings + Reviews** (users can rate past orders)
-- 👩‍💼 **Admin Panel**:
-  - Promo code management
-  - Stock management
-  - Basic reporting (orders, users, reviews)
+### n8n Workflow Architecture
 
-> These features were added to make the chatbot more useful by working with actual data.
+![n8n Workflow](images/bhukkadbay_n8n.png)
+
+The workflow consists of:
+- **Chat Trigger** — receives messages from the website widget
+- **AI Agent (OpenAI)** — understands intent and decides which tool to call
+- **Simple Memory** — maintains conversation context across messages
+- **MongoDB Tools** — three separate database connections:
+  - `Foods DB` — menu items, pricing, availability
+  - `Orders DB` — order status and payment info
+  - `PromoCode DB` — active discounts and offers
 
 ---
-<img width="960" height="583" alt="Screenshot 2025-08-04 093443" src="https://github.com/user-attachments/assets/9d70625b-1821-47aa-8b9e-8af4fd329a40" />
 
+## Chatbot Capabilities
+
+### Menu Queries
+Users can ask about food items, prices, dietary options, or availability. The chatbot queries the Foods collection in real time and responds with accurate, structured information.
+
+![Menu Query](images/bhukkadbay_home.png)
+
+---
+
+### Order Status Tracking
+When a user provides their Order ID, the chatbot connects to the Orders collection, checks the current status (preparing, out for delivery, completed), verifies payment method, and responds in natural language.
+
+![Order Status](images/bhukkadbay_order.png)
+
+---
+
+### Off-Topic Query Handling
+The chatbot identifies irrelevant or unrelated questions and responds politely, redirecting users to relevant topics. It strictly stays within its defined scope.
+
+![Off-Topic Handling](images/bhukkadbay_offtopic.png)
+
+---
+
+### Promo Codes & Offers
+Users can ask about active discounts and promotions. The chatbot reads from the PromoCode collection and returns current offers conversationally.
+
+---
+
+## Frontend Features (BhukkadBay)
+
+The customer-facing website provides a full food ordering experience:
+
+- Search bar with live filtering
+- Cart system with add / remove / update
+- Promo code application at checkout
+- Stripe payment integration
+- Ratings and reviews on past orders
+- User authentication
+
+## Admin Panel Features
+
+- Add, edit, and remove menu items
+- Stock management
+- Promo code management (create, activate, deactivate)
+- Order management and status updates
+- Reports — item-wise sales and total overview
+
+---
+
+## How to Run
+
+### Prerequisites
+- Node.js
+- MongoDB Atlas account
+- n8n instance (cloud or self-hosted)
+- OpenAI API key
+- Stripe account
+
+### Backend
+```bash
+cd backend
+npm install
+# Add your .env file with MONGO_URI, JWT_SECRET, STRIPE_SECRET_KEY
+node server.js
+```
+
+### Frontend
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+### Admin
+```bash
+cd admin
+npm install
+npm run dev
+```
+
+### n8n Chatbot
+1. Open your n8n instance
+2. Go to **Workflows** → **Import**
+3. Import `E-Commerce Support Chatbot.json`
+4. Add your MongoDB Atlas and OpenAI credentials
+5. Activate the workflow
+6. Copy the Chat Trigger webhook URL into the frontend chatbot widget
+
+---
+
+## Environment Variables
+
+Create a `.env` file in the `backend/` folder:
+
+```env
+MONGO_URI=your_mongodb_atlas_connection_string
+JWT_SECRET=your_jwt_secret
+STRIPE_SECRET_KEY=your_stripe_secret_key
+```
+
+---
+
+*Built to explore real-world automation with n8n — using a food ordering platform as the foundation.*
